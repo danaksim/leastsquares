@@ -37,7 +37,6 @@ def vec_to_diag_matrix(values, dims):
     for i in range(dims[0]):
         row = [values[i] if i == j else 0 for j in range(dims[1])]
         m.append(row)
-    # print(np.matrix(m))
     return np.matrix(m)
 
 
@@ -68,13 +67,8 @@ def solve(basis, func, interval, points=100):
     a = matrix(basis, interval, points)
     y = vector(func, interval, points)
 
-    # print(a)
-    # print('____________')
-    # print(y)
-
     col_sum = col_sqr_sum(a)
     a_scaled = scale(a, col_sum)
-    # print(a_scaled)
     print('Cond: {} -> {}'.format(np.linalg.cond(a), np.linalg.cond(a_scaled)))
 
     (u, s, vt) = (np.linalg.svd(a_scaled, full_matrices=True))
