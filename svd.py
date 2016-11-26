@@ -2,18 +2,16 @@ import math
 import numpy as np
 
 
-def matrix(funcs, interval, points=100):
-    for f in funcs:
+def matrix(basis, interval, points=100):
+    for f in basis:
         assert callable(f)
     assert type(interval) is tuple and len(interval) == 2
 
-    i = interval[0]
-    di = (interval[1] - interval[0]) / points
+    xs = np.arange(interval[0], interval[1], (interval[1] - interval[0]) / points)
     m = []
-    while i < interval[1]:
-        row = [f(i) for f in funcs]
+    for x in xs:
+        row = [f(x) for f in basis]
         m.append(row)
-        i += di
     return np.matrix(m)
 
 
@@ -21,12 +19,10 @@ def vector(func, interval, points=100):
     assert callable(func)
     assert type(interval) is tuple and len(interval) == 2
 
-    i = interval[0]
-    di = (interval[1] - interval[0]) / points
+    xs = np.arange(interval[0], interval[1], (interval[1] - interval[0]) / points)
     vec = []
-    while i < interval[1]:
-        vec.append([func(i)])
-        i += di
+    for x in xs:
+        vec.append([func(x)])
     return np.matrix(vec)
 
 
@@ -59,13 +55,35 @@ def unscale(a, col_sum):
     return np.matrix(b)
 
 
-def solve(basis, func, interval, points=100):
+def compute_combination(basis, coeffs, x):
+    assert len(basis) == len(coeffs)
+    r = 0
+    for f, c in zip(basis, coeffs):
+        r += c * f(x)
+    return r
+
+
+def deviation(data1, data2):
+    assert hasattr(data1, '__iter__') and hasattr(data2, '__iter__')
+    assert len(data1) == len(data2) and len(data1) != 0
+    ds = [math.pow(a - b, 2) for a, b in zip(data1, data2)]
+    return math.sqrt(sum(ds) / len(ds))
+
+
+def error(basis, coeffs, model, interval, points=100):
+    xs = np.arange(interval[0], interval[1], (interval[1] - interval[0]) / points)
+    approx_data = compute_combination(basis, coeffs, xs)
+    model_data = model(xs)
+    return deviation(approx_data, model_data)
+
+
+def solve(basis, model, interval, points=100):
     #   1. Compute SVD: u, s, v
     #   2. zj = ut * y / sj
     #   3. a = v * z
 
     a = matrix(basis, interval, points)
-    y = vector(func, interval, points)
+    y = vector(model, interval, points)
 
     col_sum = col_sqr_sum(a)
     a_scaled = scale(a, col_sum)
@@ -76,6 +94,9 @@ def solve(basis, func, interval, points=100):
     ut = u.transpose()
     v = vt.transpose()
     z = s.I * ut * y
-
     x = unscale(v * z, col_sum)
+    x = np.array(x.T)[0]
+
+    err = error(basis, x, model, interval, points)
+    print('Error is {}'.format(err))
     return x
