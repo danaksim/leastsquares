@@ -1,7 +1,6 @@
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
-from svd import solve, compute_combination
+from systems import ApproxSystem
 
 
 def zero_division(func):
@@ -30,10 +29,9 @@ def f3(x):
     return x ** 2
 
 basis = (f1, f2, f3)
-interval = (0.1, 0.5)
-
-s = solve(basis, source_func, interval, points=1000)
-print(s)
-# x = np.arange(interval[0], interval[1], 0.001)
-# plt.plot(x, source_func(x), x, s[0, 0]*f1(x) + s[1, 0]*f2(x) + s[2, 0]*f3(x))
-# plt.show()
+points = np.arange(0.1, 1, 0.01)
+exp_data = [(i, source_func(i)) for i in points]
+s = ApproxSystem(basis, exp_data)
+s.solve()
+tex = r'$a + bx^{-2} + cx^2$'
+s.plot(label=tex)
