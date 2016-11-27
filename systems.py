@@ -67,6 +67,7 @@ class ApproxSystem(LinearSystem):
         tex = r'\begin{eqnarray*}'
         for letter, value in zip(alph, self.solution):
             tex += r'{}&=&{:10.3f}\\'.format(letter, value)
+        tex += r'\widetilde{\overline{\rho}}&=&' + '{:10.3f}'.format(self.error)
         tex += r'\end{eqnarray*}'
         return tex
 
