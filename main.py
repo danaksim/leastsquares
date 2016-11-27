@@ -1,16 +1,5 @@
-import sys
 import numpy as np
 from systems import ApproxSystem
-
-
-def zero_division(func):
-    # Maybe return math.inf instead?
-    def wrapper(name):
-        try:
-            return func(name)
-        except ZeroDivisionError:
-            return sys.maxsize
-    return wrapper
 
 
 def source_func(x):
