@@ -20,8 +20,7 @@ class LinearSystem:
     def _solve_by_svd(self):
         col_sum = col_sqr_sum(self.left)
         left_scaled = scale(self.left, col_sum)
-        print('Cond: {} -> {}'.format(np.linalg.cond(self.left), np.linalg.cond(left_scaled)))
-
+        # print('Cond: {} -> {}'.format(np.linalg.cond(self.left), np.linalg.cond(left_scaled)))
         (u, s, vt) = (np.linalg.svd(left_scaled, full_matrices=True))
         (u, s, vt) = (np.matrix(u), vec_to_diag_matrix(s, self.left.shape), np.matrix(vt))
         ut = u.transpose()
@@ -67,7 +66,6 @@ class ApproxSystem(LinearSystem):
         alph = list(string.ascii_lowercase)
         tex = r'\begin{eqnarray*}'
         for letter, value in zip(alph, self.solution):
-            print(letter, value)
             tex += r'{}&=&{:10.3f}\\'.format(letter, value)
         tex += r'\end{eqnarray*}'
         return tex
